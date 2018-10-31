@@ -1,23 +1,32 @@
 import React, { Component } from 'react';
-import EarthquakesData from './EarthquakesData';
+import Earthquakes from './EarthquakesData';
 
 class App extends Component {
   constructor(){
     super();
     this.state = {
-      earthquackes: [],
+      earthquakes: [],
     }
   }
-
-  getEarthquackesData = async () =>{
+  getEarthquakes = async () =>{
     try {
-      const earthquackes = await fetch('');
+      const earthquakesApi = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_week.geojson');
+      const earthquakesJson = await earthquakesApi.json();
+      this.state.earthquakes.push(earthquakesJson.features);
+      console.log(this.state.earthquakes, ' this is the earthquackesData');
 
-      const earthquackesJson = await earthquackes.json();
-      return earthquackesJson;
+      return earthquakesJson;
     } catch (err) {
       return err;
     }
+  }
+
+  componentDidMount(){
+    this.getEarthquakes().then((earthquakes) =>{
+      this.setState({earthquakes: earthquakes.features});
+    }).catch((err) =>{
+      console.log(err, ' this is the error');
+    })
   }
 
 
@@ -29,9 +38,7 @@ class App extends Component {
         </div>
         <div className="quakeContainer">
           <h1>Earthquakes from the past week: </h1>
-          <div id="info">
-
-          </div>
+          <Earthquakes earthquakes={this.state.earthquakes} />
         </div>
       </div>
     );
